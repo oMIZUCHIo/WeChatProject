@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace:该mapper.xml映射文件的 唯一标识 -->
+<mapper namespace="com.zwj.mapper.FriendsMapper">
+
+    <resultMap type="com.zwj.entity.FriendsVo" id="friendsVo">
+        <association property="friends" javaType="com.zwj.entity.Friends">
+             <id property="f_id" column="f_id"/>
+                 <result property="user_id" column="user_id"/>
+                 <result property="friend_id" column="friend_id"/>
+                 <result property="friend_type_id" column="friend_type_id"/>
+                 <result property="friend_group_id" column="friend_group_id"/>
+                 <result property="for_friend_nick_name" column="for_friend_nick_name"/>
+        </association>
+        <association property="user" javaType="com.zwj.entity.User">
+           <id property="user_id" column="user_id"/>
+                <result property="user_name" column="user_name"/>
+                <result property="user_password" column="user_password"/>
+                <result property="user_icon" column="user_icon"/>
+                <result property="user_status" column="user_status"/>
+                <result property="login_time" column="login_time"/>
+        </association>
+    </resultMap>
+
+    <select id="queryFriends" parameterType="java.lang.Integer" resultMap="friendsVo">
+        SELECT u.*,f.* FROM USER u LEFT JOIN friends f ON u.user_id = f.friend_id AND f.user_id = #{user_id}
+    </select>
+
+    <select id="queryFriendsByType" parameterType="java.util.Map" resultMap="friendsVo">
+        select u.*,f.* from user u right join friends f on f.friend_type_id = #{friend_type_id} and u.user_id = f.friend_id and f.user_id = #{user_id}
+    </select>
+
+    <insert id="addFriend" parameterType="com.zwj.entity.Friends">
+        insert into friends(user_id,friend_id,friend_type_id,for_friend_nick_name) values (#{user_id},#{friend_id},#{friend_type_id},#{for_friend_nick_name})
+    </insert>
+
+    <delete id="deleteFriend" parameterType="java.util.Map">
+        delete from friends where user_id = #{user_id} and friend_id = #{friend_id}
+    </delete>
+
+
+    <update id="deleteAllFriendInGroup" parameterType="java.util.Map">
+        update friends set friend_group_id = null where user_id = #{user_id} and friend_group_id = #{friend_group_id}
+    </update>
+
+
+    <update id="updateFriendInGroup" parameterType="java.util.Map">
+        update friends set friend_group_id = #{friend_group_id} where user_id = #{user_id} and friend_id = #{friend_id}
+    </update>
+
+    <select id="isFriend" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select ifnull(MAX(f_id),0) from friends where user_id = #{user_id} and friend_id = #{friend_id} and friend_type_id = #{friend_type_id}
+    </select>
+
+
+    <update id="updateForFriendNickName" parameterType="com.zwj.entity.Friends">
+        update friends set for_friend_nick_name = #{for_friend_nick_name} where user_id = #{user_id} and friend_id = #{friend_id}
+    </update>
+
+
+    <update id="updateFriendType" parameterType="com.zwj.entity.Friends">
+        update friends set friend_type_id = #{friend_type_id} where user_id = #{user_id} and friend_id = #{friend_id}
+    </update>
+
+    <select id="hasWannaBeFriend" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select ifnull(MAX(f_id),0) from friends where user_id = #{user_id} and friend_id = #{friend_id}
+    </select>
+
+</mapper>

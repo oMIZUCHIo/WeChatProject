@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace:该mapper.xml映射文件的 唯一标识 -->
+<mapper namespace="com.zwj.mapper.UserMapper">
+
+    <select id="login" parameterType="java.lang.String" resultType="com.zwj.entity.User">
+        select * from user where user_name = #{user_name}
+    </select>
+
+    <insert id="register" useGeneratedKeys="true" keyProperty="user_id" keyColumn="user_id" parameterType="com.zwj.entity.User">
+        insert into user(user_name,user_password,user_icon,user_status,user_nick_name) values (#{user_name},#{user_password},#{user_icon},#{user_status},#{user_nick_name})
+    </insert>
+
+    <select id="queryUserIdByUserName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select ifnull(MAX(user_id),0) from user where user_name = #{user_name}
+    </select>
+
+    <update id="updateUserStatus" parameterType="com.zwj.entity.User">
+        update user set user_status = #{user_status} , login_time = #{login_time}
+        where user_id = #{user_id}
+    </update>
+
+    <select id="queryLikedUser" parameterType="java.util.Map" resultType="com.zwj.entity.User">
+        select user_id,user_name,user_icon,user_nick_name from user where user_name like concat('%',#{name},'%')  limit ${first},${final}
+    </select>
+
+    <select id="queryUserByUserId" parameterType="java.lang.Integer" resultType="com.zwj.entity.User">
+        select * from user where user_id = #{user_id}
+    </select>
+
+    <select id="queryIconByUserId" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select user_icon from user where user_id = #{user_id}
+    </select>
+
+
+    <update id="updateNickName" parameterType="com.zwj.entity.User">
+        update user set user_nick_name = #{user_nick_name} where user_id = #{user_id}
+    </update>
+
+    <update id="updateSex" parameterType="com.zwj.entity.User">
+         update user set sex = #{sex} where user_id = #{user_id}
+    </update>
+
+    <update id="updateBirthday" parameterType="com.zwj.entity.User">
+         update user set birthday = #{birthday} where user_id = #{user_id}
+    </update>
+
+    <update id="updatePersonSignature" parameterType="com.zwj.entity.User">
+         update user set person_signature = #{person_signature} where user_id = #{user_id}
+    </update>
+
+    <select id="queryUserNameAndNickById" parameterType="java.lang.Integer" resultType="com.zwj.entity.User">
+        select user_name,user_nick_name from user where user_id = #{user_id}
+    </select>
+
+
+    <update id="updateUserIcon" parameterType="com.zwj.entity.User">
+        update user set user_icon = #{user_icon} where user_id = #{user_id}
+    </update>
+
+    <select id="queryUserByUserName" parameterType="java.lang.String" resultType="com.zwj.entity.User">
+        select * from user where user_name = #{user_name}
+    </select>
+
+
+    <select id="queryUserStatus" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select user_status from user where user_id = #{user_id}
+    </select>
+
+</mapper>

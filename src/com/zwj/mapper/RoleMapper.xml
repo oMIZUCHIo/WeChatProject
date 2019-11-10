@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace:该mapper.xml映射文件的 唯一标识 -->
+<mapper namespace="com.zwj.mapper.RoleMapper">
+
+    <insert id="addUserAndRole" parameterType="com.zwj.entity.UserAndRole">
+        insert into user_role (user_id,role_id) values (#{user_id},#{role_id})
+    </insert>
+
+
+</mapper>

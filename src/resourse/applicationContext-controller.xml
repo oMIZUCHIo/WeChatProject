@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+    <!-- 将控制器所在包 加入IOC容器 -->
+    <context:component-scan base-package="com.zwj.controller" />
+    <context:component-scan base-package="com.zwj.service" />
+
+
+    <!-- 配置视图解析器 -->
+    <bean  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+
+        <property name="prefix" value="/" />
+
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <!-- 配置CommonsMultipartResolver，用于实现文件上传，将其加入SpringIOC容器.
+	springIoc容器在初始化时，会自动寻找一个Id="multipartResolver"的bean，并将其加入Ioc容器
+ -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8"/>
+        <!-- 上传单个文件的最大值，单位Byte；如果-1，表示无限制 -->
+        <property name="maxUploadSize"  value="-1"/>
+    </bean>
+
+    <!-- 该注解会让springmvc：接收一个请求，并且该请求没有对应的@requestmapping时，将该请求交给服务器默认的servlet去处理（直接访问）  -->
+    <mvc:default-servlet-handler/>
+
+    <!-- SpringMVC基础配置、标配 -->
+    <mvc:annotation-driven/>
+</beans>

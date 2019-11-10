@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace:该mapper.xml映射文件的 唯一标识 -->
+<mapper namespace="com.zwj.mapper.UserGroupsMapper">
+
+
+    <insert id="addUserGroup" useGeneratedKeys="true" keyProperty="ug_id" keyColumn="ug_id" parameterType="com.zwj.entity.UserGroups">
+        insert into user_groups(ug_name,set_up_time,admin_id,ug_icon)
+            values (#{ug_name},#{set_up_time},#{admin_id},#{ug_icon})
+    </insert>
+
+    <delete id="deleteUserGroup" parameterType="java.lang.Integer">
+        delete from user_groups where ug_id = #{ug_id}
+    </delete>
+
+    <update id="updatePositionInGroup" parameterType="java.util.Map">
+        update user_groups set ${position_name} = #{position_id} where ug_id = #{ug_id}
+    </update>
+
+
+    <select id="queryPositionInGroup" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select ifnull(MAX(ug_id),0) as ug_id from user_groups where ug_id = #{ug_id} and ${position_name} = #{position_id}
+    </select>
+
+
+    <update id="deletePositionInGroup" parameterType="java.util.Map">
+        update user_groups set ${position_name} = null where ug_id = #{ug_id} and ${position_name} = #{position_id}
+    </update>
+
+    <update id="updateAnnouncement" parameterType="java.util.Map">
+        update user_groups set ug_announcement = #{ug_announcement} where ug_id = #{ug_id}
+    </update>
+
+
+    <select id="queryIfNullPosition" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select ifnull(MAX(ug_id),0) as ug_id from user_groups where ug_id = #{ug_id} and ${position_name} is not null
+    </select>
+
+
+    <select id="queryUserGroupsByUgId" parameterType="java.lang.Integer" resultType="com.zwj.entity.UserGroups">
+        select * from user_groups where ug_id = #{ug_id}
+    </select>
+
+    <update id="updateUserGroupIcon" parameterType="java.util.Map">
+        update user_groups set ug_icon = #{ug_icon} where ug_id = #{ug_id}
+    </update>
+
+
+    <select id="queryIconInUserGroup" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select ug_icon from user_groups where ug_id = #{ug_id}
+    </select>
+
+
+    <select id="queryUserGroup" parameterType="java.lang.Integer" resultType="com.zwj.entity.UserGroups">
+        SELECT u.* FROM user_groups u JOIN users_of_user_group o ON o.ug_id = u.ug_id AND o.user_id = #{user_id}
+    </select>
+
+
+    <select id="queryUserNumInUserGroup" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select count(*) from users_of_user_group where ug_id = #{ug_id}
+    </select>
+
+    <select id="queryUserIdPosition" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select ifnull(MAX(${position_name}),0) from user_groups where ug_id = #{ug_id}
+    </select>
+</mapper>

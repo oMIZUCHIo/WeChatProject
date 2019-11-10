@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace:该mapper.xml映射文件的 唯一标识 -->
+<mapper namespace="com.zwj.mapper.FriendGroupsMapper">
+
+
+    <insert id="addFriendGroup" useGeneratedKeys="true" keyProperty="fg_id" keyColumn="fg_id" parameterType="com.zwj.entity.FriendGroups">
+       insert into friend_groups(fg_name,set_user_id) values (#{fg_name},#{set_user_id})
+    </insert>
+
+    <select id="queryGroupIdByName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select fg_id from friend_groups where fg_name = #{fg_name}
+    </select>
+
+    <select id="queryGroupNameById" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select fg_name from friend_groups where fg_id = #{fg_id}
+    </select>
+
+    <select id="queryAllGroup" parameterType="java.lang.Integer" resultType="com.zwj.entity.FriendGroups">
+        select * from friend_groups where set_user_id = #{set_user_id}
+    </select>
+
+    <delete id="deleteFriendGroup" parameterType="com.zwj.entity.FriendGroups">
+        delete from friend_groups where fg_id = #{fg_id} and set_user_id = #{set_user_id}
+    </delete>
+
+    <update id="updateFriendGroupName" parameterType="java.util.Map">
+        update friend_groups set fg_name = #{fg_name} where fg_id = #{fg_id}
+    </update>
+
+</mapper>

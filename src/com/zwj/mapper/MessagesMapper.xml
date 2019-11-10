@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace:该mapper.xml映射文件的 唯一标识 -->
+<mapper namespace="com.zwj.mapper.MessagesMapper">
+
+   <!-- <select id="queryNoReceiveMsgSum" parameterType="java.lang.Integer" resultType="com.zwj.entity.Messages">
+        select * from
+        (
+            select * from
+                 (select * from messages group by send_time desc)t
+            group by from_user_id
+        )m
+        where m.to_user_id = #{to_user_id} and m.status = 2
+    </select>-->
+
+
+    <select id="queryNoReceiveMsg" parameterType="java.util.Map" resultType="com.zwj.entity.Messages">
+        select m.*,c.content,c.content_type,c.file_name,c.file_size from messages m join contents c on c.content_id = m.content_id and m.from_user_id = #{from_user_id} and m.to_user_id = #{to_user_id} and m.status = 2
+    </select>
+
+    <select id="queryNoReceiveFromUserId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select distinct from_user_id from messages where to_user_id = #{to_user_id} and status = 2;
+    </select>
+
+
+    <insert id="addMessages" parameterType="com.zwj.entity.Messages">
+        insert into messages (from_user_id,to_user_id,content_id,send_time,status) values (#{from_user_id},#{to_user_id},#{content_id},#{send_time},#{status})
+    </insert>
+
+
+    <update id="updateMessageType" parameterType="java.util.List">
+        <foreach collection="list" separator=";" item="msg_id">
+            update messages set status = 1 where message_id = #{msg_id}
+        </foreach>
+    </update>
+
+    <select id="queryStatusMsgId" parameterType="java.util.Map">
+        select message_id from messages where from_user_id = #{from_user_id} and to_user_id = #{to_user_id} and status = #{status}
+    </select>
+
+</mapper>

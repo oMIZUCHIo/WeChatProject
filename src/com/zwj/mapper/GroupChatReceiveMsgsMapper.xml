@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace:该mapper.xml映射文件的 唯一标识 -->
+<mapper namespace="com.zwj.mapper.GroupChatReceiveMsgsMapper">
+
+
+    <insert id="addGroupReceiveMsg" parameterType="com.zwj.entity.GroupChatReceiveMsgs">
+        insert into group_chat_receive_msgs(to_user_id,send_msg_id,status,ug_id)
+            values (#{to_user_id},#{send_msg_id},#{status},#{ug_id})
+    </insert>
+
+
+    <select id="getGroupChatSendMsgsIds" parameterType="com.zwj.entity.GroupChatReceiveMsgs" resultType="java.lang.Integer">
+        select send_msg_id from group_chat_receive_msgs where to_user_id = #{to_user_id} and ug_id = #{ug_id} and status = #{status}
+    </select>
+
+
+    <select id="deleteGroupReceiveMsg" parameterType="java.lang.Integer">
+        delete from group_chat_receive_msgs where ug_id = #{ug_id}
+    </select>
+
+
+    <select id="queryStatusGroupMsgId" parameterType="java.util.Map">
+        select gcrm_id from group_chat_receive_msgs where ug_id = #{ug_id} and to_user_id = #{to_user_id} and status = #{status}
+    </select>
+
+
+    <update id="updateGroupMessageType" parameterType="java.util.List">
+        <foreach collection="list" separator=";" item="msg_id">
+            update group_chat_receive_msgs set status = 1 where gcrm_id = #{msg_id}
+        </foreach>
+    </update>
+
+</mapper>

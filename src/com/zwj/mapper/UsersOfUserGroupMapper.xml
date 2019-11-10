@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace:该mapper.xml映射文件的 唯一标识 -->
+<mapper namespace="com.zwj.mapper.UsersOfUserGroupMapper">
+
+
+    <insert id="addUserInUserGroup" parameterType="com.zwj.entity.UsersOfUserGroup">
+        insert into users_of_user_group (user_id,ug_id) values (#{user_id},#{ug_id})
+    </insert>
+
+    <delete id="deleteUserInUserGroup" parameterType="com.zwj.entity.UsersOfUserGroup">
+        delete from users_of_user_group where user_id = #{user_id} and ug_id = #{ug_id}
+    </delete>
+
+    <delete id="deleteAllUserInGroup" parameterType="java.lang.Integer">
+        delete from users_of_user_group where ug_id = #{ug_id}
+    </delete>
+
+    <update id="updateNikeName" parameterType="java.util.Map">
+        update users_of_user_group set nick_name = #{nick_name} where ug_id = #{ug_id} and user_id = #{user_id}
+    </update>
+
+    <select id="getUserIdsListInGroup" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select user_id from users_of_user_group where ug_id = #{ug_id}
+    </select>
+
+    <select id="getGroupIdsList" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select ug_id from users_of_user_group where user_id = #{user_id}
+    </select>
+
+    <select id="getAllUserVoList" parameterType="java.lang.Integer" resultType="com.zwj.entity.UserVo">
+        select u.user_id,u.user_name,u.user_icon,u.user_status,g.nick_name from users_of_user_group g join user u on g.user_id = u.user_id and ug_id = #{ug_id}
+    </select>
+
+    <select id="queryNickNameInGroup" parameterType="com.zwj.entity.UsersOfUserGroup" resultType="java.lang.String">
+        select nick_name from users_of_user_group where user_id = #{user_id} and ug_id = #{ug_id}
+    </select>
+
+
+    <select id="queryUserIdInGroup" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select user_id from users_of_user_group where ug_id = #{ug_id}
+    </select>
+
+</mapper>

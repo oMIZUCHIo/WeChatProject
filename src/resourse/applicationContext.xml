@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:websocket="http://www.springframework.org/schema/websocket"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+       http://www.springframework.org/schema/aop
+	   http://www.springframework.org/schema/aop/spring-aop.xsd
+	   http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd
+	   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/tx">
+
+    <!-- conf.xml :  数据源,mapper.xml -->
+    <context:component-scan base-package="com.zwj.entity"/>
+    <context:component-scan base-package="com.zwj.webSocket"/>
+    <context:component-scan base-package="com.zwj.aop"/>
+    <context:component-scan base-package="com.zwj.exception"/>
+
+    <!--  数据源  -->
+    <!-- 加载db.properties文件 -->
+    <bean  id="config" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+        <property name="locations">
+            <array>
+                <value>classpath:resourse/db.properties</value>
+            </array>
+        </property>
+    </bean>
+
+    <!-- 配置配置数据库信息（替代mybatis的配置文件conf.xml） -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${driver}" />
+        <property name="url" value="${url}" />
+        <property name="username" value="${username}" />
+        <property name="password" value="${password}" />
+    </bean>
+
+    <!-- 配置MyBatis需要的核心类：SqlSessionFactory -->
+    <!-- 在SpringIoc容器中创建MyBatis的核心类 SqlSesionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- 加载mapper.xml路径 -->
+        <property name="mapperLocations" value="classpath:com/zwj/mapper/UserGroupsMapper.xml" />
+    </bean>
+
+    <!-- 将MyBatis的SqlSessionFactory 交给Spring -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+        <property name="basePackage" value="com.zwj.mapper" />
+        <!--上面basePackage所在的property的作用：
+           将org.lanqiao.mapper包中，所有的接口产生与之对应的动态代理对象
+           （对象名就是首字母小写的接口名） ：studentMapper.querystudentBYNO();
+         -->
+    </bean>
+
+
+    <bean id="userService" class="com.zwj.service.impl.UserServiceImpl"/>
+    <bean id="friendsService" class="com.zwj.service.impl.FriendsServiceImpl"/>
+    <bean id="messagesService" class="com.zwj.service.impl.MessagesServiceImpl"/>
+    <bean id="groupChatReceiveMsgsService" class="com.zwj.service.impl.GroupChatReceiveMsgsServiceImpl"/>
+    <bean id="groupChatSendMsgsService" class="com.zwj.service.impl.GroupChatSendMsgsServiceImpl"/>
+    <bean id="usersOfUserGroupService" class="com.zwj.service.impl.UsersOfUserGroupServiceImpl"/>
+    <bean id="user" class="com.zwj.entity.User"/>
+
+
+    <bean class="com.alibaba.fastjson.support.spring.FastJsonJsonView">
+        <property name="features">
+            <list>
+                <!-- 输出key时是否使用双引号
+                <value>QuoteFieldNames</value>-->
+                <!-- 是否输出值为null的字段 -->
+                <value>WriteMapNullValue</value>
+                <!-- List字段如果为null,输出为[],而非null -->
+                <value>WriteNullListAsEmpty</value>
+                <!-- 字符类型字段如果为null,输出为”“,而非null -->
+                <value>WriteNullStringAsEmpty</value>
+                <!-- 整型类型字段如果为null,输出为0 -->
+                <value>WriteNullNumberAsZero</value>
+                <!-- boolean字段如果为null,输出为false,而非null -->
+                <value>WriteNullBooleanAsFalse</value>
+            </list>
+        </property>
+    </bean>
+
+
+    <!--  开启注解对AOP的支持  -->
+    <aop:aspectj-autoproxy/>
+
+
+    <mvc:interceptors>
+         <!-- 使用bean定义一个Interceptor，直接定义在mvc:interceptors根下面的Interceptor将拦截所有的请求-->
+ <mvc:interceptor>
+     <!-- 进行拦截：/**表示拦截所有controller-->
+   <mvc:mapping path="/**" />
+     <!--  不进行拦截-->
+     <mvc:exclude-mapping path="/loginController/login" />
+     <mvc:exclude-mapping path="/registerController/register" />
+     <mvc:exclude-mapping path="/ChatWebSocket" />
+     <mvc:exclude-mapping path="/TestSocket" />
+     <bean class="com.zwj.Interceptor.JWTInterceptor" />
+ </mvc:interceptor>
+</mvc:interceptors>
+
+
+<!-- 配置事务管理器txManager -->
+<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource"  ref="dataSource"/>
+</bean>
+
+    <!-- 事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 通知-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="select*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.zwj.service.impl.*.*(..))"/>
+    </aop:config>
+
+
+</beans>
